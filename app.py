@@ -52,6 +52,19 @@ st.header("Upgrade Log")
 if st.session_state.upgrade_log:
     df = pd.DataFrame(st.session_state.upgrade_log)
     st.dataframe(df, use_container_width=True)
+
+    # ---------- Let users download upgrade log
+    # Download button for log only
+    st.subheader("Download Upgrade Log Only")
+    timestamp_str = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+    file_name = f"{timestamp_str}_upgrade_log.csv"
+    csv = df.to_csv(index=False)
+    st.download_button(
+        label="Download Upgrade Log as CSV",
+        data=csv,
+        file_name=file_name,
+        mime="text/csv"
+    )
 else:
     st.write("No data logged yet.")
 
@@ -111,6 +124,24 @@ if st.session_state.upgrade_log and len(st.session_state.upgrade_log) > 1:
     st.subheader("Normalized Pattern Groups (Caesar Shift)")
     df_normalized = pd.DataFrame(normalized_counts.items(), columns=["Shift Pattern", "Count"])
     st.table(normalized)
+
+    # ----------- Let users save/download their data
+    st.subheader("Download PATTERN data as CSV")
+
+    # Combine all tables into one df
+    all_data_df = pd.concat([df_pairs, df_normalized], ignore_index=True)
+    # Filename
+    timestamp_str = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+    file_name = f"{timestamp_str}_artifact_upgrade_data.csv"
+
+    # CSV file
+    csv = all_data_df.to_csv(index=False)
+    st.download_button(
+        label="Download All Data as CSV",
+        data=csv,
+        file_name=file_name,
+        mime="text/csv"
+    )
 
 else:
     st.info("Add at least 2 upgrade events to analyze patterns.")
